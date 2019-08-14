@@ -28,6 +28,20 @@ public class ErrorMessage {
         return this;
     }
 
+    public ErrorMessage get1001(){
+        code = "1001";
+        description = "The price and the count of product must be positive!";
+        status = Response.Status.CONFLICT;
+        return this;
+    }
+
+    public ErrorMessage get1002(Integer count){
+        code = "1002";
+        description = String.format("Not enough products to sell! Sold only %s of products!", count);
+        status = Response.Status.CONFLICT;
+        return this;
+    }
+
     @Override
     public String toString(){
         return String.format("Code: %s\n" +
