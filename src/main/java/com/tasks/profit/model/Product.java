@@ -39,4 +39,5 @@ public class Product{
     public List<Lot> getStack(){
         return new ArrayList<>(lot);
     }
+
 }
