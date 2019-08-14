@@ -2,14 +2,13 @@ package com.tasks.profit.model;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.*;
 
 //@XmlRootElement (name="product")
 public class Product{
     private int id;
     public String name;
-    public Integer count;
-    public Integer price;
-    public String date;
+    private Deque<Lot> lot = new ArrayDeque<Lot>();
 
     public int getId (){
         return id;
@@ -18,28 +17,26 @@ public class Product{
     public void setId(int id){
         this.id = id;
     }
-    public Integer getCount(){
-        return count;
-    }
-    public void setCount(Integer count){
-        this.count = count;
-    }
-    public Integer getPrice(){
-        return price;
-    }
-    public void setPrice(Integer price){
-        this.price = price;
-    }
-    public String getDate(){
-        return date;
-    }
-    public void setDate(String date){
-        this.date = date;
+
+    public boolean noDouble(Product p) {
+        return name.equals(p.name);
     }
 
-    @Override
-    public boolean equals(Object o){
-        Product product = (Product)o;
-        return this.name.equals(product.name);
+    public void push(Lot lot, int id){
+        lot.id = id;
+        //this.lot.add(lot);
+        this.lot.offerLast(lot);
+    }
+
+    public Lot pop(){
+        return lot.pollFirst();
+    }
+
+    public Lot peek(){
+        return lot.peekFirst();
+    }
+
+    public List<Lot> getStack(){
+        return new ArrayList<>(lot);
     }
 }
