@@ -1,9 +1,9 @@
 package com.tasks.profit.server;
 
 
+import com.tasks.profit.exception.ConflictException;
 import com.tasks.profit.exception.ErrorMessage;
 import com.tasks.profit.exception.NotFoundException;
-import com.tasks.profit.exception.ProductAlreadyExists;
 import com.tasks.profit.model.Lot;
 import com.tasks.profit.model.Product;
 
@@ -19,12 +19,13 @@ public class RestServer {
     static private Integer idLot = 0;
 
     @GET
+    @Path("/getall")
     //@Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public List<Product> getAll(){ return productDB; }
 
     @POST
-    @Path("/addAll")
+    @Path("/addall")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public String addAll(List<Product> products){
@@ -41,7 +42,7 @@ public class RestServer {
         if (!productDB.isEmpty()){
             if (contains(product)) {
                 ErrorMessage errorMessage = new ErrorMessage();
-                throw new ProductAlreadyExists(errorMessage.get409(product.name));
+                throw new ConflictException(errorMessage.get409(product.name));
             }
             idProduct++;
         }
@@ -50,17 +51,17 @@ public class RestServer {
         return "OK";
     }
 
-    @GET
-    @Path("/get/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Product getProduct(@PathParam("id") int id){
-        try {
-            return productDB.get(id);
-        } catch (IndexOutOfBoundsException e){
-            ErrorMessage errorMessage = new ErrorMessage();
-            throw new NotFoundException(errorMessage.get404());
-        }
-    }
+//    @GET
+//    @Path("/get/{id}")
+//    @Produces(MediaType.APPLICATION_JSON)
+//    public Product getProduct(@PathParam("id") int id){
+//        try {
+//            return productDB.get(id);
+//        } catch (IndexOutOfBoundsException e){
+//            ErrorMessage errorMessage = new ErrorMessage();
+//            throw new NotFoundException(errorMessage.get404());
+//        }
+//    }
 
     @POST
     @Path("/purchase")
@@ -77,7 +78,7 @@ public class RestServer {
             }
             else {
                 ErrorMessage errorMessage = new ErrorMessage();
-                throw new NotFoundException(errorMessage.get1001());
+                throw new ConflictException(errorMessage.get1001());
             }
         } else {
             ErrorMessage errorMessage = new ErrorMessage();
@@ -90,10 +91,10 @@ public class RestServer {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public String saleLot(Lot lot){
-        Integer id;
+        Integer id; Profit profit;
         if ((id=indexContain(lot.name)) != null){
             Product product = productDB.get(id);
-            Profit profit = new Profit(lot.name);
+            profit = new Profit(lot.name);
             Lot anotherLot;
             while ((anotherLot = product.peek())!= null & lot.count != 0) {
                 if (anotherLot.count > lot.count) {
@@ -119,7 +120,7 @@ public class RestServer {
         if (lot.count == 0) return "OK";
         else {
                 ErrorMessage newErrorMessage = new ErrorMessage();
-                throw new NotFoundException(newErrorMessage.get1002(lot.count));
+                throw new ConflictException(newErrorMessage.get1002(profit.countLot));
         }
     }
 
@@ -128,6 +129,7 @@ public class RestServer {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public String salesReport(Lot lot){
+
         Profit profit;
         for (int i = 0; i<profits.size(); i++){
             profit = profits.get(i);
@@ -135,7 +137,16 @@ public class RestServer {
                 if(profit.getDate().equals(lot.date))
                     return "Sold for " + profit.getProfit();
         }
-        return "Not found!";
+        ErrorMessage errorMessage = new ErrorMessage();
+        throw new NotFoundException(errorMessage.get404());
+    }
+
+    @GET
+    @Path("/tryget")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public String tryGet(Lot name){
+        return " OKKKKKK " + name;
     }
 
     @GET
