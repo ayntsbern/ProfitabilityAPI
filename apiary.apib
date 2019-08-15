@@ -1,0 +1,205 @@
+FORMAT: 1A
+HOST: http://localhost:8080/ProfitabilityAPI/rest/products
+
+# ProfitAPI
+
+### ProfitAPI расчитывает себестоимость по методу FIFO. 
+
+ProfitAPI может производить следующие основные запросы:
+- Создание товара
+- Закупка товара
+- Продажа товара
+- Расчет прибыльности
+
+### СТРУКТУРА ОШИБОК
+Ошибки представляют собой строку **error**, содержащий поля, каждое из которых описывает отдельную информацию.
+
+### СТРУКТУРА СТРОКИ ERROR
+- `Code` - Код ошибки
+- `Description` - Описание ошибки
+- `Error status` - Статус ошибки.
+
+## Товар [/products]
+
+### Создать товар [POST /newproduct]
+
++ Request (application/json)
+
+    + Attributes 
+        + name: Apple (string) - уникальное название товара
+
++ Response 200 (text/plain)
+    OK
+
++ Response 409 (text/plain)
+    Code: 409
+    Description: Product /name/ already exists!
+    Error status: Conflict
+
+### Закупить товар [POST /purchase]
+
++ Request (application/json)
+
+    + Attributes
+        + name: Apple (string) - название товара, который требуется закупить
+        + count: 2 (number) - количество товара, который требуется закупить
+        + price: 2000 (number) - стоимость закупки товара в руб.
+        + date: 03.08.2016 (string) - дата закупки товара
+
++ Response 200 (text/plain)
+
++ Response 1001 (text/plain)
+    Code: 1001
+    Description: The price and the count of product must be positive!
+    Error status: Conflict
+    
++ Response 404 (text/plain)
+    Code: 404
+    Description: Product not found!
+    Error status: Not Found
+
+### Продать товар [POST /demand]
+
++ Request (application/json)
+
+    + Attributes
+        + name: Apple (string) - название товара, который требуется продать
+        + count: 2 (number) - количество продаваемого товара
+        + price: 2000 (number) - стоимость продажи товара в руб.
+        + date: 03.08.2016 (string) - дата продажи товара
+        
++ Response 200 (text/plain)
+
++ Response 404 (text/plain)
+    Code: 404
+    Description: Product not found!
+    Error status: Not Found
+    
++ Response 1002 (text/plain)
+    Code: 1002
+    Description: Not enough products to sell! Sold only /count/ of products!
+    Error status: Conflict
+        
+### Рассчитать прибыльность [GET /salesreport]
+
++ Request (application/json)
+
+    + Attributes
+        + name: Apple (string) - название товара, по которому требуется рассчитать
+        + date: 03.08.2016 (string) - дата, за которую требуется рассчитать 
+      
++ Response 200 (text/plain)  
+    + Attributes
+        + report (string) - Прибыль по заданному товару за заданную дату
+
++ Response 404 (text/plain)
+    Code: 404
+    Description: Product not found!
+    Error status: Not Found
+
+## Дополнтельно [/]
+
+### Добавить товары в виде списка [POST /addall]
+
++ Request (application/json)
+
+    + Attributes
+        + name: Apple (string) - уникальное название товара
+    
+    + Body
+    [
+        {"name": "Apple"},
+        {"name": "Samsung" },
+        {"name": "Xiaomi" },
+        {"name": "Huawei" },
+        {"name": "Meizu" }
+    ]
+    
++ Response 200 (text/plain)
+
++ Response 409 (text/plain)
+    Code: 409
+    Description: Product /name/ already exists!
+    Error status: Conflict
+    
+### Показать все созданные товары [GET /getAll]
+
++ Response 200 (application/json)
+    + Attributes
+        + id: 0 (number) - номер товара
+        + name: Apple (string) - уникальное название товара
+        + stack (object) - закупленные товары 
+            + id: 0 (number) - номер закупки
+            + name: Apple (string) - уникальное название товара, который закупался
+            + count: 2 (number) - количество закупленного товара
+            + price: 2000 (number) - стоимость в руб., по которой закупали твоар
+            + date: 03.08.2016 (string) - дата закупки товара
+    + Body
+        [
+            {
+                "id": 0,
+                "name": "Apple",
+                "stack": [
+                    {
+                        "id": 2,
+                        "name": "Apple",
+                        "count": 2,
+                        "price": 2000,
+                        "date": "03.08.2016"
+                    },
+                    {
+                        "id": 3,
+                        "name": "Apple",
+                        "count": 2,
+                        "price": 2000,
+                        "date": "03.08.2016"
+                    }
+                ]
+            },
+            {
+                "id": 1,
+                "name": "Samsung",
+                "stack": [
+                    {
+                        "id": 0,
+                        "name": "Samsung",
+                        "count": 8,
+                        "price": 1500,
+                        "date": "03.08.2016"
+                    },
+                    {
+                        "id": 1,
+                        "name": "Samsung",
+                        "count": 1,
+                        "price": 1000,
+                        "date": "03.08.2016"
+                    },
+                ]
+            }
+        ]
+            
+### Показать все купленные товары [GET /lots]
++ Response 200 (application/json)
+    + Attributes
+        + id: 0 (number) - номер закупки
+        + name: Apple (string) - уникальное название товара, который закупался
+        + count: 2 (number) - количество закупленного товара
+        + price: 2000 (number) - стоимость в руб., по которой закупали твоар
+        + date: 03.08.2016 (string) - дата закупки товара
+    + Body
+        [
+            {
+                "id": 0,
+                "name": "Apple",
+                "count": 2,
+                "price": 2000,
+                "date": "03.08.2016"
+            },
+            {
+                "id": 3,
+                "name": "Apple",
+                "count": 5,
+                "price": 1000,
+                "date": "03.08.2016"
+            }
+        ]
