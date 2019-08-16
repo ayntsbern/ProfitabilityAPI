@@ -1,5 +1,8 @@
 package com.tasks.profit.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement
 public class Lot {
     public int id;
     public String name;

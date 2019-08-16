@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.*;
 
-//@XmlRootElement (name="product")
+@XmlRootElement (name="product")
 public class Product{
     private int id;
     public String name;
