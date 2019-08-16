@@ -126,27 +126,18 @@ public class RestServer {
 
     @GET
     @Path("/salesreport")
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
-    public String salesReport(Lot lot){
+    public String salesReport(@QueryParam("name") String name,
+                              @QueryParam("date") String date){
 
-        Profit profit;
-        for (int i = 0; i<profits.size(); i++){
-            profit = profits.get(i);
-            if(profit.name.equals(lot.name))
-                if(profit.getDate().equals(lot.date))
+        for (Profit profit : profits){
+            if(profit.name.equals(name))
+                if(profit.getDate().equals(date))
                     return "Sold for " + profit.getProfit();
         }
         ErrorMessage errorMessage = new ErrorMessage();
         throw new NotFoundException(errorMessage.get404());
-    }
-
-    @GET
-    @Path("/tryget")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.TEXT_PLAIN)
-    public String tryGet(Lot name){
-        return " OKKKKKK " + name;
     }
 
     @GET
