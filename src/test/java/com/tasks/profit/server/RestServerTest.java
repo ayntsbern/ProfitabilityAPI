@@ -1,22 +1,12 @@
 package com.tasks.profit.server;
-
-import com.tasks.profit.model.Lot;
-import com.tasks.profit.model.Product;
-import org.eclipse.jetty.http.HttpTester;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
-import org.glassfish.jersey.uri.UriComponent;
+
 import org.junit.Test;
 
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.*;
-
-
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.*;
@@ -93,11 +83,11 @@ public class RestServerTest extends JerseyTest {
 
     @Test
     public void newLot_withNOExistingName() {
-        target("products/newproduct").request().post(Entity.json("{\"name\" : \"Samsung\"}"));
+        target("products/newproduct").request().post(Entity.json("{\"name\" : \"RussianPhone\"}"));
 
         Response response = target("products/purchase").
                 request().post(Entity.json("{\n" +
-                "\t\"name\" : \"Apple\",\n" +
+                "\t\"name\" : \"Lenovo\",\n" +
                 "\t\"count\": 2,\n" +
                 "\t\"price\": 2000,\n" +
                 "\t\"date\" : \"05.05.2019\" \n" +
@@ -165,15 +155,15 @@ public class RestServerTest extends JerseyTest {
 
     @Test
     public void saleLot_whenHaveLessThenNeed() {
-        target("products/newproduct").request().post(Entity.json("{\"name\" : \"Apple\"}"));
+        target("products/newproduct").request().post(Entity.json("{\"name\" : \"Sony Ericsson\"}"));
 
         target("products/purchase").
-                request().post(Entity.json("{\n \t\"name\" : \"Apple\",\n \t\"count\": 2,\n" +
+                request().post(Entity.json("{\n \t\"name\" : \"Sony Ericsson\",\n \t\"count\": 2,\n" +
                 "\t\"price\": 2000,\n \t\"date\" : \"05.05.2019\" \n }"));
 
         Response response = target("products/demand").
                 request().post(Entity.json("{\n" +
-                "\t\"name\" : \"Apple\",\n" +
+                "\t\"name\" : \"Sony Ericsson\",\n" +
                 "\t\"count\": 5,\n" +
                 "\t\"price\": 5000,\n" +
                 "\t\"date\" : \"07.05.2019\" \n" +
@@ -188,48 +178,23 @@ public class RestServerTest extends JerseyTest {
 
     @Test
     public void salesReport() {
-        target("products/newproduct").request().post(Entity.json("{\"name\" : \"Apple\"}"));
+        target("products/newproduct").request().post(Entity.json("{\"name\" : \"HUAWEI\"}"));
 
         target("products/purchase").
-                request().post(Entity.json("{\n \t\"name\" : \"Apple\",\n \t\"count\": 1,\n" +
+                request().post(Entity.json("{\n \t\"name\" : \"HUAWEI\",\n \t\"count\": 1,\n" +
                 "\t\"price\": 1000,\n \t\"date\" : \"05.05.2019\" \n }"));
         target("products/purchase").
-                request().post(Entity.json("{\n \t\"name\" : \"Apple\",\n \t\"count\": 2,\n" +
+                request().post(Entity.json("{\n \t\"name\" : \"HUAWEI\",\n \t\"count\": 2,\n" +
                 "\t\"price\": 2000,\n \t\"date\" : \"05.05.2019\" \n }"));
 
-        target("products/demand").request().post(Entity.json("{\n \t\"name\" : \"Apple\",\n" +
+        target("products/demand").request().post(Entity.json("{\n \t\"name\" : \"HUAWEI\",\n" +
                 "\t\"count\": 2,\n \t\"price\": 5000,\n \t\"date\" : \"07.05.2019\" \n }"));
 
-        //target("products/salesreport").request().post(Entity.json("{\n \t\"name\" : \"Apple\",\n \t\"date\" : \"07.05.2019\" \n }"));
 
-        Entity entity = Entity.json("{ \"name\":\"Apple\",\"date\": \"07.05.2019\"}");
-        String json = "{ \"name\":\"Apple\",\"date\": \"07.05.2019\"}";
-        //target("products/salesreport").request().build("GET", Entity.json("{ \"name\":\"Apple\",\"date\": \"07.05.2019\"}"));
-//        Response response = target("products/salesreport").request().accept(MediaType.APPLICATION_JSON).
-//                header(MediaType.APPLICATION_JSON, Entity.json("{ \"name\":\"Apple\",\"date\": \"07.05.2019\"}")).get();
-//        System.out.println(response);
-        Lot lot = new Lot();
-        lot.name = "Apple";
-        lot.date = "07.05.2019";
-        Response response = target("products/salesreport").request().header(MediaType.APPLICATION_JSON,json).accept(MediaType.APPLICATION_JSON).get();
-        System.out.println(response.getHeaders());
-//        String content = response.readEntity(String.class);
-//        assertEquals("Http Response should be 200: ", Response.Status.OK.getStatusCode(), response.getStatus());
-//        assertEquals("Http Content-Type should be: ", MediaType.TEXT_PLAIN, response.getHeaderString(HttpHeaders.CONTENT_TYPE));
-//        assertEquals("Should return 7000", "Sold for 7000", content);
-    }
+        String response = target("products/salesreport").queryParam("name", "HUAWEI").queryParam("date","07.05.2019").
+                request().accept(MediaType.TEXT_PLAIN).get(String.class);
 
-    @Test
-    public void tryGet(){
-        MultivaluedMap<String, String> params = new MultivaluedHashMap<>();
-        params.add("name", "x");
-        params.add("date", "07.05.2019");
-        String response = target("products/tryget").queryParam("name", Entity.json("{\"name\" : \"x\"}")).
-                request().accept(MediaType.APPLICATION_JSON).get(String.class);
-        System.out.println(response);
-    }
-    @Test
-    public void lots() {
 
+        assertThat(response, containsString("Sold for 7000"));
     }
 }
